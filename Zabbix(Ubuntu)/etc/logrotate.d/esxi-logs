@@ -1,0 +1,13 @@
+/var/log/esxi/*/*.log /var/log/esxi/*.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 syslog adm
+    sharedscripts
+    postrotate
+        systemctl restart rsyslog.service > /dev/null 2>&1 || true
+    endscript
+}

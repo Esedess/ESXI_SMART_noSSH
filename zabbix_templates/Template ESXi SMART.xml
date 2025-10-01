@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>7.4</version>
+    <template_groups>
+        <template_group>
+            <uuid>e960332b3f6c46a1956486d4f3f99fce</uuid>
+            <name>Templates/Server hardware</name>
+        </template_group>
+    </template_groups>
+    <templates>
+        <template>
+            <uuid>f6a2a2fa2e1e49be96dc5ce777b2dd34</uuid>
+            <template>Template ESXi SMART</template>
+            <name>Template ESXi SMART</name>
+            <groups>
+                <group>
+                    <name>Templates/Server hardware</name>
+                </group>
+            </groups>
+            <discovery_rules>
+                <discovery_rule>
+                    <uuid>bd5a1d254efa46929968c491b761c028</uuid>
+                    <name>ESXi SMART discovery</name>
+                    <type>TRAP</type>
+                    <key>esxi.smart.discovery</key>
+                    <lifetime>3d</lifetime>
+                    <enabled_lifetime_type>DISABLE_AFTER</enabled_lifetime_type>
+                    <enabled_lifetime>1d</enabled_lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <uuid>2f6b8eba3c9a4a26a5e527b0c22d4357</uuid>
+                            <name>SMART Health [{#DISK}]</name>
+                            <type>TRAP</type>
+                            <key>esxi.smart.health_status[{#DISK}]</key>
+                            <value_type>TEXT</value_type>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <uuid>ffbf05ef71df4b4caecb3f89ac307b1d</uuid>
+                                    <expression>nodata(/Template ESXi SMART/esxi.smart.health_status[{#DISK}],20m)=1</expression>
+                                    <name>SMART Disk Lost</name>
+                                    <priority>HIGH</priority>
+                                    <manual_close>YES</manual_close>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>ICMP Ping: Unavailable by ICMP ping</name>
+                                            <expression>max(/ICMP Ping/icmpping,#3)=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <uuid>71f03355aaaa46299ffc68df423a4e2d</uuid>
+                                    <expression>last(/Template ESXi SMART/esxi.smart.health_status[{#DISK}])&lt;&gt;&quot;OK&quot;</expression>
+                                    <name>SMART Health not OK</name>
+                                    <priority>HIGH</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>e67d1df6f46241ab869de68c569bb79c</uuid>
+                            <name>SMART Media_errors [{#DISK}]</name>
+                            <type>TRAP</type>
+                            <key>esxi.smart.media_errors[{#DISK}]</key>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <uuid>2137259d1f4e425c8983eb36f0c3b90a</uuid>
+                                    <expression>change(/Template ESXi SMART/esxi.smart.media_errors[{#DISK}])&gt;0</expression>
+                                    <name>SMART NVMe: media errors appeared</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>f27c3f53c2d34f4c9d9d5e4f460daeda</uuid>
+                            <name>SMART Media_wearout [{#DISK}]</name>
+                            <type>TRAP</type>
+                            <key>esxi.smart.media_wearout[{#DISK}]</key>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <uuid>585d12ba9bce4ea49d47c2dd4326c877</uuid>
+                                    <expression>min(/Template ESXi SMART/esxi.smart.media_wearout[{#DISK}],7d)&lt;10</expression>
+                                    <name>SMART Media Wearout low</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>a19c8274b9ac424298af4002cbfa11e4</uuid>
+                            <name>SMART Power_on_hours [{#DISK}]</name>
+                            <type>TRAP</type>
+                            <key>esxi.smart.power_on_hours[{#DISK}]</key>
+                            <units>h</units>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>ba5db0e4987b443ab0115d30c50e61e8</uuid>
+                            <name>SMART Reallocated_sectors [{#DISK}]</name>
+                            <type>TRAP</type>
+                            <key>esxi.smart.reallocated_sectors[{#DISK}]</key>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <uuid>7d54ac5ce4ac4c6d96da93e561513149</uuid>
+                                    <expression>change(/Template ESXi SMART/esxi.smart.reallocated_sectors[{#DISK}])&gt;0</expression>
+                                    <name>SMART Reallocated sectors grew</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>3521702028ab47a08a19325655b90d9b</uuid>
+                            <name>SMART Temperature [{#DISK}]</name>
+                            <type>TRAP</type>
+                            <key>esxi.smart.temperature[{#DISK}]</key>
+                            <units>°C</units>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <uuid>919d5669f6314cae90d167dba395c52d</uuid>
+                                    <expression>last(/Template ESXi SMART/esxi.smart.temperature[{#DISK}])&gt;60</expression>
+                                    <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                                    <recovery_expression>last(/Template ESXi SMART/esxi.smart.temperature[{#DISK}])&lt;55</recovery_expression>
+                                    <name>SMART Critical temperature</name>
+                                    <priority>HIGH</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <uuid>2ab4d3dbe4fb43a6be570e12d23bee1e</uuid>
+                                    <expression>last(/Template ESXi SMART/esxi.smart.temperature[{#DISK}])&gt;50</expression>
+                                    <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                                    <recovery_expression>last(/Template ESXi SMART/esxi.smart.temperature[{#DISK}])&lt;45</recovery_expression>
+                                    <name>SMART High temperature warning</name>
+                                    <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>SMART Critical temperature</name>
+                                            <expression>last(/Template ESXi SMART/esxi.smart.temperature[{#DISK}])&gt;60</expression>
+                                            <recovery_expression>last(/Template ESXi SMART/esxi.smart.temperature[{#DISK}])&lt;55</recovery_expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>e238b222c32a4da28a566505fb2498fe</uuid>
+                            <name>SMART Uncorrectable_errors [{#DISK}]</name>
+                            <type>TRAP</type>
+                            <key>esxi.smart.uncorrectable_errors[{#DISK}]</key>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <uuid>c06335f2ea564ebda41bea70d248346f</uuid>
+                                    <expression>change(/Template ESXi SMART/esxi.smart.uncorrectable_errors[{#DISK}])&gt;0</expression>
+                                    <name>SMART Uncorrectable errors appeared</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>9206f6088e504045aa0f58a20d367979</uuid>
+                            <name>SMART Unsafe_shutdowns [{#DISK}]</name>
+                            <type>TRAP</type>
+                            <key>esxi.smart.unsafe_shutdowns[{#DISK}]</key>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <uuid>08b1ced0d9584b6eb3dc94ae89a94aeb</uuid>
+                                    <expression>change(/Template ESXi SMART/esxi.smart.unsafe_shutdowns[{#DISK}])&gt;0</expression>
+                                    <name>SMART NVMe: unsafe shutdowns increased</name>
+                                    <priority>INFO</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>811324cd2b334280b1108e89b5d7dfc8</uuid>
+                            <name>SMART Failed_commands [{#DISK}]</name>
+                            <type>TRAP</type>
+                            <key>esxi.stats.failed_commands[{#DISK}]</key>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <uuid>d4775b73b9524b30a272b02dd22ef5fb</uuid>
+                                    <expression>change(/Template ESXi SMART/esxi.stats.failed_commands[{#DISK}])&gt;0</expression>
+                                    <name>SMART Failed commands appeared</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>fc23adcaf4d54f12beae048c891db025</uuid>
+                            <name>SMART Failed_reads [{#DISK}]</name>
+                            <type>TRAP</type>
+                            <key>esxi.stats.failed_reads[{#DISK}]</key>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <uuid>247fbb57a2b042d18dc896e8ea3af5bd</uuid>
+                                    <expression>change(/Template ESXi SMART/esxi.stats.failed_reads[{#DISK}])&gt;0</expression>
+                                    <name>SMART Failed reads appeared</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>6b4c7b7f5865442caab3cd22b3a2137c</uuid>
+                            <name>SMART Failed_writes [{#DISK}]</name>
+                            <type>TRAP</type>
+                            <key>esxi.stats.failed_writes[{#DISK}]</key>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <uuid>7e50e513eebc44b8becb0486e12589bb</uuid>
+                                    <expression>change(/Template ESXi SMART/esxi.stats.failed_writes[{#DISK}])&gt;0</expression>
+                                    <name>SMART Failed writes appeared</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>9bb221ee62be4a2a8045219ef1b65051</uuid>
+                            <name>SMART Read_ops [{#DISK}]</name>
+                            <type>TRAP</type>
+                            <key>esxi.stats.read_ops[{#DISK}]</key>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>71908d026bbe425db8bb3e8ee0810a73</uuid>
+                            <name>SMART Reservation_conflicts [{#DISK}]</name>
+                            <type>TRAP</type>
+                            <key>esxi.stats.reservation_conflicts[{#DISK}]</key>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <uuid>d398243ca6f74fe2b509813d3d2c5a7f</uuid>
+                                    <expression>change(/Template ESXi SMART/esxi.stats.reservation_conflicts[{#DISK}])&gt;0</expression>
+                                    <name>SMART Reservation conflicts appeared</name>
+                                    <priority>INFO</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>fd5afd99ef414bd49e834bfbb8446966</uuid>
+                            <name>SMART Write_ops [{#DISK}]</name>
+                            <type>TRAP</type>
+                            <key>esxi.stats.write_ops[{#DISK}]</key>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+            </discovery_rules>
+        </template>
+    </templates>
+</zabbix_export>

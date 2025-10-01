@@ -1,0 +1,19 @@
+[Unit]
+Description=Zabbix ESXi SMART forwarder
+After=network.target rsyslog.service
+Requires=rsyslog.service
+
+[Service]
+Type=simple
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+WorkingDirectory=/opt/scripts
+ExecStart=/opt/scripts/forwarder.sh
+User=syslog
+Group=adm
+Restart=on-failure
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
