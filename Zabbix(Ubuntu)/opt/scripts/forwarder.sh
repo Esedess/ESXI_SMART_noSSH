@@ -29,10 +29,11 @@ process_line() {
         echo "\"$host\" esxi.smart.discovery $JSON" >> "$TMPDIR/$host.discovery"
         echo "$(ts) DISCOVERY -> host=$host" >> "$FORWARDER_LOG"
         ;;
-      SMART_DATA|SMART_STATS)
-        # METRIC="$(echo "$line" | sed -n 's/.*\(esxi\.[^ ]* [^ ]*\)$/\1/p')"
+    SMART_DATA|SMART_STATS)
         METRIC="$(echo "$line" | sed -n 's/.*\(esxi\.[^ ]* .*\)$/\1/p' | sed 's/[[:space:]]*$//')"
         if [[ -n "$METRIC" ]]; then
+            # если в конце два числа — оставить первое, второе убрать
+            METRIC="$(printf '%s' "$METRIC" | sed -E 's/ ([0-9]+) [0-9]+$/ \1/')"
             echo "\"$host\" $METRIC" >> "$TMPDIR/$host.metrics"
             echo "$(ts) METRIC -> host=$host $METRIC" >> "$FORWARDER_LOG"
         fi
