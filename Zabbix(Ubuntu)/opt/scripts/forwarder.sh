@@ -21,7 +21,7 @@ process_line() {
     local line="$2"
 
     local host=$(basename "$(dirname "$logfile")")
-    local tag=$(echo "$line" | awk '{print $3}' | cut -d'[' -f1)
+    local tag=$(echo "$line" | awk '{print $3}' | sed 's/[:\[].*//')
 
     case "$tag" in
       SMART_DISCOVERY)
