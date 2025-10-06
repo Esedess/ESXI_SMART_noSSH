@@ -65,6 +65,46 @@ SMART_DATA[...] esxi.smart.health_status[...] OK
 SMART_DISCOVERY { "data": [...] }
 ```
 
+### Устойчивость после перезагрузки
+
+ESXi очищает /opt, /var и cron при ребуте, поэтому smart-logger.sh нужно восстанавливать.
+
+1. Сохраните скрипт в постоянное хранилище /store:
+   mkdir -p /store/scripts
+   cp /opt/scripts/smart-logger.sh /store/scripts/
+   chmod +x /store/scripts/smart-logger.sh
+
+2. Добавьте восстановление в /etc/rc.local.d/local.sh (перед строкой exit 0):
+
+   ```bash
+   # --- Restore SMART logger after reboot ---
+   if [ -f /store/scripts/smart-logger.sh ]; then
+       logger -t SMART_RESTORE "Restoring smart-logger.sh and cron"
+       mkdir -p /opt/scripts
+       cp /store/scripts/smart-logger.sh /opt/scripts/
+       chmod +x /opt/scripts/smart-logger.sh
+
+       if ! grep -q "smart-logger.sh" /var/spool/cron/crontabs/root 2>/dev/null; then
+           echo "*/5 * * * * /opt/scripts/smart-logger.sh" >> /var/spool/cron/crontabs/root
+       fi
+
+       /etc/init.d/crond restart || true
+       logger -t SMART_RESTORE "Restore complete"
+   fi
+   # --- End restore ---
+   ```
+
+   ```bash
+   chmod +x /etc/rc.local.d/local.sh
+   ```
+
+После перезагрузки проверь:
+   ```bash
+   grep SMART_RESTORE /var/log/syslog.log | tail -n 5
+   cat /var/spool/cron/crontabs/root | grep smart-logger
+   ls -l /opt/scripts/smart-logger.sh
+   ```
+
 ---
 
 ## 2. Настройка Ubuntu (Zabbix-сервера)

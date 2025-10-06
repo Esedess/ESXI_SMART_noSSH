@@ -83,6 +83,46 @@ vi /var/spool/cron/crontabs/root
 */5 * * * * /opt/scripts/smart-logger.sh
 ```
 
+После этого можно проверить запустив скрипт руками
+```bash
+/opt/scripts/smart-logger.sh
+```
+## Важно для ESXi
+
+Файловые пути /opt, /var, /tmp и crontab на ESXi находятся в RAM и очищаются после каждой перезагрузки.  
+Чтобы скрипт и расписание не терялись:
+
+1. Скопируйте smart-logger.sh в постоянное хранилище:
+   mkdir -p /store/scripts
+   cp /opt/scripts/smart-logger.sh /store/scripts/
+   chmod +x /store/scripts/smart-logger.sh
+
+2. Восстанавливайте скрипт и cron при загрузке через /etc/rc.local.d/local.sh (добавьте перед exit 0):
+
+   ```bash
+   # --- Restore SMART logger after reboot ---
+   if [ -f /store/scripts/smart-logger.sh ]; then
+       logger -t SMART_RESTORE "Restoring smart-logger.sh and cron"
+       mkdir -p /opt/scripts
+       cp /store/scripts/smart-logger.sh /opt/scripts/
+       chmod +x /opt/scripts/smart-logger.sh
+
+       if ! grep -q "smart-logger.sh" /var/spool/cron/crontabs/root 2>/dev/null; then
+           echo "*/5 * * * * /opt/scripts/smart-logger.sh" >> /var/spool/cron/crontabs/root
+       fi
+
+       /etc/init.d/crond restart || true
+       logger -t SMART_RESTORE "Restore complete"
+   fi
+   # --- End restore ---
+   ```
+   ```bash
+   chmod +x /etc/rc.local.d/local.sh
+   ```
+
+Теперь при каждом запуске хост восстановит скрипт и cron-задачу автоматически.
+
+
 ### На Ubuntu
 ```bash
 # Каталоги для логов ESXi
