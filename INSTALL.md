@@ -88,7 +88,6 @@ ESXi очищает /opt, /var и cron при ребуте, поэтому smart
            echo "*/5 * * * * /opt/scripts/smart-logger.sh" >> /var/spool/cron/crontabs/root
        fi
 
-       /etc/init.d/crond restart || true
        logger -t SMART_RESTORE "Restore complete"
    fi
    # --- End restore ---
