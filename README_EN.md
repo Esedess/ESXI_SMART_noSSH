@@ -48,6 +48,15 @@ ESXi → syslog → rsyslog (Ubuntu) → forwarder.sh → zabbix_sender → Zabb
    esxcli system syslog config set --loghost='udp://<ZABBIX_IP>:514'
    esxcli system syslog reload
    ```
+   Allowing Syslog in ESXi Firewall:
+   ```bash
+   esxcli network firewall ruleset set --ruleset-id=syslog --enabled=true
+   ```
+   Check the rule status:
+   ```bash
+   esxcli network firewall ruleset list | grep syslog
+   ```
+
 
 2. Copy `smart-logger.sh` to `/opt/scripts/` on the ESXi host and add it to cron:  
    ```bash
@@ -88,6 +97,18 @@ ESXi → syslog → rsyslog (Ubuntu) → forwarder.sh → zabbix_sender → Zabb
       ```
 
     After that, each time the host boots, it will automatically restore both the script and its cron job.
+
+    ESXi stores its configuration in RAM, which resets after reboot.
+      To permanently save the hostname, cron jobs, and syslog configuration, run:
+
+      ```bash
+      /sbin/auto-backup.sh
+      ```
+
+      Verify the archive date:
+      ```bash
+      ls -lh /bootbank/state.tgz
+      ```
 
 3. On the Zabbix server (Ubuntu):  
    - Place `40-esxi.conf` in `/etc/rsyslog.d/`  

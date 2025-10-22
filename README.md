@@ -75,6 +75,9 @@ esxcli system hostname set --host=hostname
 esxcli system syslog config set --loghost='udp://<ZABBIX_IP>:514'
 esxcli system syslog reload
 
+# Firewall Разрешить пересылку логов
+esxcli network firewall ruleset set --ruleset-id=syslog --enabled=true
+
 # Установить скрипт SMART-логгера
 mkdir -p /opt/scripts/
 vi /opt/scripts/smart-logger.sh
@@ -123,6 +126,10 @@ vi /var/spool/cron/crontabs/root
 
 Теперь при каждом запуске хост восстановит скрипт и cron-задачу автоматически.
 
+3. Сохранение конфигурации
+   ```bash
+   /sbin/auto-backup.sh
+   ```
 
 ### На Ubuntu
 ```bash

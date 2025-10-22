@@ -40,6 +40,20 @@ esxcli system syslog config get
 ```
 Если пусто — значит команда не сработала.
 
+
+По умолчанию ESXi блокирует исходящие syslog-пакеты. Разрешаем
+
+```bash
+esxcli network firewall ruleset set --ruleset-id=syslog --enabled=true
+```
+Проверить состояние:
+```bash
+esxcli network firewall ruleset list | grep syslog
+```
+Ожидаем:
+```bash
+syslog                true
+```
 ---
 
 ### 1.3. Скрипт SMART-логгера
@@ -103,6 +117,20 @@ ESXi очищает /opt, /var и cron при ребуте, поэтому smart
    cat /var/spool/cron/crontabs/root | grep smart-logger
    ls -l /opt/scripts/smart-logger.sh
    ```
+
+### Сохранение конфигурации (важно)
+
+ESXi хранит настройки в оперативной памяти, и они теряются при ребуте.
+Чтобы зафиксировать hostname, cron и syslog-конфиг, выполни:
+
+```bash
+/sbin/auto-backup.sh
+```
+
+Проверить дату архива:
+```bash
+ls -lh /bootbank/state.tgz
+```
 
 ---
 
