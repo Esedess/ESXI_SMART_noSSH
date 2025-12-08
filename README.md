@@ -66,6 +66,15 @@ ESXi → syslog → rsyslog (Ubuntu) → forwarder.sh → zabbix_sender → Zabb
 ## Быстрый старт
 
 ### На ESXi
+
+## Автоматическая установка и обновление SMART-мониторинга на ESXi
+
+Подробная инструкция по использованию автоустановщика:
+
+➡ [ESXi/INSTALL_AUTOMATION.md](ESXi/INSTALL_AUTOMATION.md)
+
+## Либо руками
+
 ```bash
 # Проверить/задать имя хоста
 esxcli system hostname get

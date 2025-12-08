@@ -6,6 +6,12 @@
 
 ## 1. Настройка ESXi
 
+## Автоматическая установка и обновление SMART-мониторинга на ESXi
+
+Подробная инструкция по использованию автоустановщика:
+
+➡ [ESXi/INSTALL_AUTOMATION.md](ESXi/INSTALL_AUTOMATION.md)
+
 ### 1.1. Проверка и установка hostname
 Имя хоста в ESXi должно совпадать с именем узла в Zabbix.  
 Если этого не сделать — данные просто не попадут в нужный хост.
@@ -30,13 +36,14 @@ esxcli system hostname set --host=hostname
 Включаем syslog, чтобы логи летели на сервер с Zabbix.
 
 ```bash
-esxcli system syslog config set --loghost='udp://<ZABBIX_IP>:514'
+esxcli system syslog config set --loghost='tcp://<ZABBIX_IP>:514'
+esxcli system syslog config set --remote-host-max-msg-len=2048
 esxcli system syslog reload
 esxcli system syslog config get
 ```
 Ожидаемый результат:  
 ```
-   LogHost: udp://<ZABBIX_IP>:514
+   LogHost: tcp://<ZABBIX_IP>:514
 ```
 Если пусто — значит команда не сработала.
 

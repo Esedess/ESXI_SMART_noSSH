@@ -3,7 +3,7 @@
 ESXCLI="/bin/esxcli"
 
 # 1) Список дисков
-DEVICES=$($ESXCLI storage core device list | grep -E "^(naa|t10|nvme)" | awk '{print $1}')
+DEVICES=$($ESXCLI storage core device list | grep -E "^(naa|t10|nvme|eui)" | awk '{print $1}')
 
 # 2) LLD discovery
 DISCOVERY_JSON=$(printf '{"data":[%s]}' "$(for d in $DEVICES; do printf '{"{#DISK}":"%s"},' "$d"; done | sed 's/,$//')")
